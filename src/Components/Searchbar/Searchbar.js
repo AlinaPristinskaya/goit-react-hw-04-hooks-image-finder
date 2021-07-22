@@ -1,5 +1,6 @@
 import React,{Component} from 'react';
 import { toast } from 'react-toastify';
+import s from './Searchbar.module.css'
 
 
 class Searchbar extends Component {
@@ -9,13 +10,12 @@ class Searchbar extends Component {
     }
     
     handelChange=event=>{
-        console.log(event.currentTarget.value)
         this.setState({galleryName:event.currentTarget.value})
     }
     handelSubmit=event=>{
         event.preventDefault();
         if(this.state.galleryName.trim() === ''){
-            toast.error('Введите что хотите найти');
+            toast('Введите что хотите найти');
             return
         }
 
@@ -27,15 +27,29 @@ class Searchbar extends Component {
     render() {
         
          return (
-        <><form onSubmit={this.handelSubmit}>
-            <button type="submit">иконка лупы</button>      
-            <input             
+        <>
+      <header className={s.Searchbar}>
+        <form className={s.SearchForm} onSubmit={this.handelSubmit}>
+          <button type="submit" className={s.SearchForm_button}>
+          <span className={s.SearchForm_button_label}>Search</span>
+          </button>
+
+          <input
             onChange={this.handelChange}
-            value={this.state.name}
+            value={this.state.galleryName}
+            className={s.SearchForm_input}
             type="text"
-            name="name"            
-            required/>
-          </form> 
+            autoComplete="off"
+            autoFocus
+            placeholder="Search images and photos"/>
+        </form>
+     </header> 
+
+
+
+
+
+
         </>
       );
   
