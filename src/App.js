@@ -2,17 +2,19 @@ import React,{Component} from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './Components/Searchbar';
-import ImageGallery from './Components/ImageGallery'
+import ImageGallery from './Components/ImageGallery';
+
 
 
 
 class App extends Component {
   state={
-    galleryName:''
+    galleryName:'',
   }
-  handelSearchbarSubmit=galleryName=>{
-    this.setState({galleryName})
+  handelSearchbarSubmit=name=>{
+    this.setState({galleryName:name})
   }
+  
   
    
   render() {
@@ -20,7 +22,7 @@ class App extends Component {
            return (
           <>
             <Searchbar onSubmit={this.handelSearchbarSubmit}/>
-            <ImageGallery galleryName={this.state.galleryName}/>
+            <ImageGallery galleryName={this.state.galleryName}/>            
             <ToastContainer autoClose={3000} />
           </>
           

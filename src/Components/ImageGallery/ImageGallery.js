@@ -1,85 +1,112 @@
 import { Component } from "react";
-import ImageGalleryItem from '../ImageGalleryItem';
+import { toast } from "react-toastify";
+import ImageGalleryItem from "../ImageGalleryItem/ImageGalleryItem";
+import API from '../API'
 import s from './ImageGallery.module.css';
-import { toast } from 'react-toastify';
-import Button from '../Button'
+import Loader from '../Loader'
+import Button from "../Button";
+
 
 
 
 
 export default class ImageGallery extends Component {
-    
     state={
-        gallery:null, 
-        error:null,
-        status:'idle',
-        page:1       
+        loading:false,
+        error:false,
+        dataSet:null,
+        page:1,
+        visibleButton:false,
         
-    }
-        componentDidUpdate(prevProps,prevState){
-        const prevName=prevProps.galleryName;
-        const nextName=this.props.galleryName;
-        
-        
-        if(prevName!==nextName){
-            this.setState({status:'pending',gallery:null,error:null});            
-            const MY_KEY=`21851027-176a1d26dd1c513dea811d525`;
-            const url =`https://pixabay.com/api/?image_type=photo&orientation=horizontal&q=${nextName}&page=${this.state.page}&per_page=12&key=${MY_KEY}`;
-            fetch(url)
-            .then(res=>res.json())
-            .then(galleryObj=>{
-                if(galleryObj.total!==0){
-                    this.setState({gallery:galleryObj,status:'resolved'})
 
-                } else {this.setState({gallery:null, 
-                    loading:false,error:true,status:'rejected'
-                    });
-                    toast.error('vvtdite corectnii zapros')} 
-                    
-                })  
-        }
     }
-    incrementPage=()=>{
-        console.log(18);
-        this.setState({page:2})
+    
+    componentDidUpdate(prexProps,prevState){
         
+        const prevQuery=prexProps.galleryName;
+        const nextQuery=this.props.galleryName;
+        const prevPage=prevState.page;
+        const nextPage=this.state.page;
+               
+        if(prevQuery!==nextQuery){
+            this.setState({page:1,dataSet:[]});
+         
+        }
+        if((prevQuery!==nextQuery)||(prevPage!==nextPage)){
+            this.getFetch()
+        }
+
+          
+    }
+    getFetch=()=>{
+        const{page}=this.state;
+        const query=this.props.galleryName
+        
+        this.setState({loading:true,visibleButton:false});
+        
+
+
+        API.fetchAPI(query,page)
+        .then(data=>{
+                if(data.hits.length===0){ 
+                toast.error('Ничего не найденно по вашему запросу.Введите коректный запрос')
+            }
+            if(data.hits.length!==12){
+                toast('Это последние картинки');
+                
+            }
+            this.setState(prevState=>({dataSet:[...prevState.dataSet,...data.hits],visibleButton:true}));
+            
+        })
+            
+        .catch(error=>this.setState({error}))    
+        .finally(()=>{
+            this.setState({loading:false});
+            this.scroll(); 
+            })
+    
+
+    }
+        
+    handelButton=()=>{
+        this.setState(prevState=>({page:prevState.page+1}));
         
     }
     
-    resetPage(){
-        this.setState({page:2})
+
+    scroll=()=>{
+        window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth',
+          });
     }
+     
+   
+      
     render(){
+        return(
+        <div>
+            
+            {this.state.error&&<div>Произошла ошибка при запросе</div>}
+            {this.state.loading&&<Loader/>}
+            {!this.props.galleryName &&<div>Стейт пустой, введите что хотите найти</div>}
+            {this.state.dataSet&&
+            
+             <ul className={s.ImageGallery}>{this.state.dataSet.map(card=>
+                 <ImageGalleryItem id={card.id}
+                 webformatURL={card.webformatURL} 
+                 largeImageURL={card.largeImageURL}
+                  />)}</ul>}
+             {this.state.visibleButton&&<div><Button onClick={this.handelButton}/></div>}
+             
+           
+        </div>
+
+    )
         
-            if (this.state.status==='idle'){
-                return <div>vvedite zapros</div>
-            }
-
-            if (this.state.status==='pending'){
-                return <div>loading...</div>
-            }
-            
-            if (this.state.status==='rejected'){
-                return <p>{this.state.error}</p>
-
-            }
-
-            if (this.state.status==='resolved'){
-                return <> <ul key={1111} className={s.ImageGallery}>{this.state.gallery.hits.map((card)=>
-                    <ImageGalleryItem              
-                    id={card.id}
-                    webformatURL={card.webformatURL}
-                    largeImageURL={card.largeImageURL}/>)}</ul>
-                    <div><Button 
-                    incrementPage={this.incrementPage} 
-                    resetpage={this.resetPage} 
-                    fetch={this.componentDidUpdate}
-                    length={this.state.gallery.hits}/></div>
-                    </>
-            }
-            
-            
+    }
 }
+    
             
             
 
@@ -90,4 +117,3 @@ export default class ImageGallery extends Component {
     
         
       
-}

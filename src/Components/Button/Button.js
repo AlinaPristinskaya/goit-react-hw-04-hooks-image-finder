@@ -1,40 +1,16 @@
-import { Component } from "react";
-import s from './Button.module.css'
-  
-class Button extends Component{
-    state={
-        length:this.props.length,
-        
-    }
-  handelSubmit=e=>{
-    e.preventDefault();
-    if (this.state.length.length===12){
-        console.log(this.state.length.length);
-        this.props.incrementPage()
-        this.props.fetch();
+import PropTypes from "prop-types";
+import s from "./Button.module.css";
 
-    }
-    
-   
-  }
+const Button = ({ onClick }) => {
+  return (
+    <button onClick={onClick} className={s.Button}>
+      Load more
+    </button>
+  );
+};
 
+Button.propTypes = {
+  onClick: PropTypes.func.isRequired,
+};
 
-render(){
-    console.log(this.state.length.length)
-    return  <form onSubmit={this.handelSubmit}>
-          <button 
-          type="submit"  
-           
-          className={s.Button}>Load More
-          </button>
-          </form>
-
-}
-  
-}
-    
-   
-  
-  
-  
-  export default Button;
+export default Button;
