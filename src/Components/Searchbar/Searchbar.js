@@ -28,13 +28,13 @@ class Searchbar extends Component {
         
          return (
         <>
-      <header className={s.Searchbar}>
-        <form className={s.SearchForm} onSubmit={this.handelSubmit}>
-          <button type="submit" className={s.SearchForm_button}>
-          <span className={s.SearchForm_button_label}>Search</span>
-          </button>
+          <header className={s.Searchbar}>
+           <form className={s.SearchForm} onSubmit={this.handelSubmit}>
+           <button type="submit" className={s.SearchForm_button}>
+           <span className={s.SearchForm_button_label}>Search</span>
+           </button>
 
-          <input
+           <input
             onChange={this.handelChange}
             value={this.state.galleryName}
             className={s.SearchForm_input}
@@ -42,8 +42,8 @@ class Searchbar extends Component {
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"/>
-        </form>
-     </header> 
+          </form>
+        </header> 
 
 
 
