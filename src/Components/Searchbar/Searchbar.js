@@ -1,9 +1,48 @@
-import React,{Component} from 'react';
+import React,{useState} from 'react';
 import { toast } from 'react-toastify';
 import s from './Searchbar.module.css'
 
+function Searchbar({onSubmit}){
+  const [galleryName, setGalleryName]=useState('');
 
-class Searchbar extends Component {
+  const handelChange=event=>{
+    setGalleryName(event.currentTarget.value)
+  }
+
+  const handelSubmit=event=>{
+  event.preventDefault();
+  if(galleryName.trim() === ''){
+      toast('Введите что хотите найти');
+      return
+  }
+  onSubmit(galleryName);
+  setGalleryName('');
+  }
+
+  return (
+    <>
+      <header className={s.Searchbar}>
+       <form className={s.SearchForm} onSubmit={handelSubmit}>
+       <button type="submit" className={s.SearchForm_button}>
+       <span className={s.SearchForm_button_label}>Search</span>
+       </button>
+
+       <input
+        onChange={handelChange}
+        value={galleryName}
+        className={s.SearchForm_input}
+        type="text"
+        autoComplete="off"
+        autoFocus
+        placeholder="Search images and photos"/>
+       </form>
+      </header> 
+
+    </>
+  );
+
+}
+/* class Searchbar extends Component {
     
     state = {
       galleryName:''
@@ -18,7 +57,6 @@ class Searchbar extends Component {
             toast('Введите что хотите найти');
             return
         }
-
         this.props.onSubmit(this.state.galleryName);
         this.setState({galleryName:''});
     }
@@ -33,7 +71,6 @@ class Searchbar extends Component {
            <button type="submit" className={s.SearchForm_button}>
            <span className={s.SearchForm_button_label}>Search</span>
            </button>
-
            <input
             onChange={this.handelChange}
             value={this.state.galleryName}
@@ -44,14 +81,8 @@ class Searchbar extends Component {
             placeholder="Search images and photos"/>
           </form>
         </header> 
-
-
-
-
-
-
         </>
       );
   
-    }}
+    }} */
     export default Searchbar;

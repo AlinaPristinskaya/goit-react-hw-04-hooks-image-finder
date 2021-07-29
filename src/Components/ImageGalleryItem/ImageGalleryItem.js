@@ -1,7 +1,7 @@
 import s from './ImageGalleryItem.module.css'
 
 
-const ImageGalleryItem = ({ imageSrc, openModalCard }) => {
+ const ImageGalleryItem = ({ imageSrc, openModalCard }) => {
   return (
     <li className={s.ImageGalleryItem}>
       <img
@@ -13,6 +13,5 @@ const ImageGalleryItem = ({ imageSrc, openModalCard }) => {
     </li>
   );
 };
-
 
 export default ImageGalleryItem;

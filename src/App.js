@@ -1,4 +1,4 @@
-import React,{Component} from 'react';
+import React,{useEffect, useState} from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './Components/Searchbar';
@@ -9,38 +9,33 @@ import { toast } from "react-toastify";
 import Loader from './Components/Loader';
 import Modal from './Components/Modal'
 
-class App extends Component {
-  state={
-    galleryName:'',
-    loading:false,
-    error:false,
-    dataSet:null,
-    page:1,
-    visibleButton:false,
-    visibleModal:false,
-    largeImageURL:null
-  }
-  componentDidUpdate(prevProps,prevState){
-        
-    const prevQuery=prevState.galleryName;
-    const nextQuery=this.state.galleryName;
-    const prevPage=prevState.page;
-    const nextPage=this.state.page;
-           
-    if(prevQuery!==nextQuery){
-        this.setState({page:1,dataSet:[]});
+function App(){
+  const [galleryName,setGalleryName]=useState('');
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState(false);
+  const [dataSet,setDataSet]=useState(null);
+  const [page,setPage]=useState(1);
+  const [visibleButton,setVisibleButton]=useState(false);
+  const [visibleModal, setVisibleModal]=useState(false);
+  const [largeImageURL,setLargeImageURL]=useState(null);
+  useEffect(() => {
+    setPage(1);
+    setDataSet([])
+  }, [galleryName]);
+
+  useEffect(() => {
+    if(galleryName===''&&page===1){
+      return
      
     }
-    if((prevQuery!==nextQuery)||(prevPage!==nextPage)){
-        this.getFetch()
-    }
+    getFetch();    
+   // eslint-disable-next-line 
+  }, [galleryName,page]);
 
+  const getFetch=()=>{
+    setLoading(true);
+    setVisibleButton(false);
       
-  }
-  getFetch=()=>{
-    const{page, galleryName}=this.state;
-    this.setState({loading:true,visibleButton:false});
-  
     API.fetchAPI(page,galleryName)
      .then(data=>{
           if(data.hits.length===0){ 
@@ -50,55 +45,51 @@ class App extends Component {
           toast('Это последние картинки');
           
        }
-      this.setState(prevState=>({dataSet:[...prevState.dataSet,...data.hits],visibleButton:true}));
-     })      
-    .catch(error=>this.setState({error}))    
+       setDataSet(prev=>([...prev,...data.hits]));
+       setVisibleButton(true);
+    })      
+    .catch(error=>setError(error))    
     .finally(()=>{
-      this.setState({loading:false});
-      this.scroll(); 
+      setLoading(false);
+      scroll(); 
       })
   }
 
-  scroll=()=>{
+  const scroll=()=>{
     window.scrollTo({
       top: document.documentElement.scrollHeight,
       behavior: 'smooth',
     });
   }
+  const handelSearchbarSubmit=name=>{
+    setGalleryName(name)
+    } 
+  
+  const handelButton=()=>{
+    setPage(prev=>(prev+1))
+           
+    }
+  
+  const  toggleModal = () =>
+       setVisibleModal(prev=>(!prev))
+      
+  
+  const  modalCard = (largeImageURL) => {
+      setLargeImageURL(largeImageURL);
+      toggleModal();
+    }
+  return (
+      <>
+        <Searchbar onSubmit={handelSearchbarSubmit}/>
+        {error&&<div>Произошла ошибка при запросе</div>}
+        {loading&&<Loader/>}
+        {dataSet &&<ImageGallery data={dataSet} modalCard={modalCard}/>} 
+        {visibleButton&&<div><Button onClick={handelButton}/></div>}           
+        <ToastContainer autoClose={3000} />
+        {visibleModal && (<Modal onClick={toggleModal}><img src={largeImageURL} alt="" /></Modal>)}
+      </>
+      
+ )
 
-  handelSearchbarSubmit=name=>{
-  this.setState({galleryName:name})
-  } 
-
-  handelButton=()=>{
-    this.setState(prevState=>({page:prevState.page+1}));
-   
-  }
-
-  toggleModal = () =>
-    this.setState(({ visibleModal }) => ({ visibleModal: !visibleModal }));
-
-  modalCard = (largeImageURL) => {
-   this.setState({ largeImageURL});
-   this.toggleModal();
-  }
-   
-  render() {
-     
-           return (
-          <>
-            <Searchbar onSubmit={this.handelSearchbarSubmit}/>
-            {this.state.error&&<div>Произошла ошибка при запросе</div>}
-            {this.state.loading&&<Loader/>}
-            {this.state.dataSet &&<ImageGallery data={this.state.dataSet} modalCard={this.modalCard}/>} 
-            {this.state.visibleButton&&<div><Button onClick={this.handelButton}/></div>}           
-            <ToastContainer autoClose={3000} />
-            {this.state.visibleModal && (<Modal onClick={this.toggleModal}><img src={this.state.largeImageURL} alt="" /></Modal>)}
-          </>
-          
-     )
-   
-  }
 }
-
 export default App;
